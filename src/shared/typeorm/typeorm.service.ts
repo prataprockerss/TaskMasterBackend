@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class TypeOrmConfigService {
@@ -17,7 +18,7 @@ export class TypeOrmConfigService {
       schema: 'public',
       logging: false,
       synchronize: false,
-      autoLoadEntities: true,
+      autoLoadEntities: false
     };
   }
 }
