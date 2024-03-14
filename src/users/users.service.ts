@@ -1,17 +1,12 @@
-import {
-  HttpException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { SignInDTO } from './dto/sign-in-dto';
-import { JwtService} from '@nestjs/jwt'
+import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
