@@ -17,6 +17,7 @@ import { Public } from 'src/decorator/public.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);

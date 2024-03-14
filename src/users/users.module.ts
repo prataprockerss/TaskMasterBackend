@@ -14,7 +14,7 @@ import { AuthGuard } from 'src/guards/auth.guards';
       global: true,
       secret: 'TEST',
       signOptions: {
-        expiresIn: '60s',
+        expiresIn: '10m',
       },
     }),
   ],

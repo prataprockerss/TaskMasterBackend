@@ -22,4 +22,7 @@ export class User {
 
   @Column()
   updatedOn: string;
+
+  @Column()
+  guid: string;
 }

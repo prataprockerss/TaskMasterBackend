@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { SignInDTO } from './dto/sign-in-dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -22,13 +23,18 @@ export class UsersService {
     createUserDto.password = await this.convertHashPassword(
       createUserDto.password,
     );
-    const response = this.userRepository.save(createUserDto);
-    return response;
+    createUserDto.guid = uuid();
+    const {email,guid} = await this.userRepository.save(createUserDto);
+    const token = this.signToken({
+      email: email,
+      userId: guid
+    })
+    return token;
   }
 
   findAll() {
     return this.userRepository.find({
-      select: ['firstName', 'lastName', 'id', 'email', 'addedOn'],
+      select: ['firstName', 'lastName', 'guid', 'email', 'addedOn'],
     });
   }
 
@@ -59,12 +65,16 @@ export class UsersService {
       throw new UnauthorizedException();
     }
 
-    const token = this.jwtService.sign({ email: user.email, id: user.id });
+    const token = this.signToken({ email: user.email, id: user.guid });
 
     return token;
   }
 
   async convertHashPassword(plainPassword: string): Promise<string> {
     return await bcrypt.hash(plainPassword, 10);
+  }
+
+  signToken(payload) {
+    return this.jwtService.sign(payload);
   }
 }
