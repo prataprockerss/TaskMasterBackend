@@ -7,6 +7,9 @@ import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users/users.service';
 import { DataSource } from 'typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guards';
 
 @Module({
   imports: [
@@ -18,9 +21,11 @@ import { DataSource } from 'typeorm';
         return dataSource;
       },
     }),
-    UsersModule,
+    UsersModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService
+  ],
 })
 export class AppModule {}

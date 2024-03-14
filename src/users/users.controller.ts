@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SignInDTO } from './dto/sign-in-dto';
+import { Public } from 'src/decorator/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -30,5 +40,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+  @Public()
+  @Post('/sign-in')
+  signIn(@Body() body: SignInDTO) {
+    return this.usersService.signIn(body);
   }
 }

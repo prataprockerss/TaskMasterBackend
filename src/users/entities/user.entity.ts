@@ -1,8 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn("increment")
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column()
@@ -11,8 +17,15 @@ export class User {
   @Column()
   lastName: string;
 
-  @Column({
-    nullable: false
-  })
+  @Column()
   addedOn: string;
+
+  @Column()
+  email: string;
+
+  @Column()
+  password: string;
+
+  @Column()
+  updatedOn: string;
 }

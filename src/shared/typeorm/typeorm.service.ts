@@ -16,9 +16,9 @@ export class TypeOrmConfigService {
       password: this.config.get('DB_PASSWORD'),
       database: this.config.get('DB_NAME'),
       schema: 'public',
-      logging: false,
+      logging: true,
       synchronize: false,
-      autoLoadEntities: false
+      autoLoadEntities: true
     };
   }
 }
