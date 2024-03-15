@@ -4,8 +4,9 @@ import { UsersController } from './users.controller';
 import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD,APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from 'src/guards/auth.guards';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -25,6 +26,10 @@ import { AuthGuard } from 'src/guards/auth.guards';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor
+    }
   ],
   exports: [UsersService],
 })

@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { TodoModule } from './todo/todo.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -17,6 +18,7 @@ import { DataSource } from 'typeorm';
       },
     }),
     UsersModule,
+    TodoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
