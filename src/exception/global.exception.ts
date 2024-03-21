@@ -7,14 +7,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = context.getRequest();
     const response = context.getResponse();
 
-    console.log({ exception: exception.constructor });
-    response.status(503).json(this.globalResponse(0, '', exception));
-  }
-  globalResponse(status, message, cause) {
-    return {
-      status,
-      message,
-      cause,
-    };
+    response.status(503).json({
+      status: 0,
+      message: 'Something went wrong',
+      cause: exception,
+    });
   }
 }
