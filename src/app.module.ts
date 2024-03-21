@@ -32,8 +32,8 @@ import { GlobalResponse } from './interceptors/response.interceptors';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: GlobalResponse
-    }
+      useClass: GlobalResponse,
+    },
   ],
 })
 export class AppModule {}

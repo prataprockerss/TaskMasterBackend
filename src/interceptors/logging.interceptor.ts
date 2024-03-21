@@ -4,15 +4,19 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const now = Date.now();
-    
-    console.log(`${request.url} with ${request.method} is started ${new Date().getTime()}`)
+
+    console.log(
+      `${request.url} with ${
+        request.method
+      } is started ${new Date().getTime()}`,
+    );
     return next
       .handle()
       .pipe(tap(() => console.log(`After... ${Date.now() - now}ms`)));

@@ -24,11 +24,11 @@ export class UsersService {
       createUserDto.password,
     );
     createUserDto.guid = uuid();
-    const {email,guid} = await this.userRepository.save(createUserDto);
+    const { email, guid } = await this.userRepository.save(createUserDto);
     const token = this.signToken({
       email: email,
-      userId: guid
-    })
+      userId: guid,
+    });
     return token;
   }
 

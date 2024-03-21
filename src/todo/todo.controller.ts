@@ -6,6 +6,6 @@ export class TodoController {
   constructor(private todoService: TodoService) {}
   @Get()
   getTodo() {
-    return this.todoService.getTodo()
+    return this.todoService.getTodo();
   }
 }
