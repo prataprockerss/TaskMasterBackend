@@ -19,13 +19,24 @@ export class UsersController {
 
   @Public()
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const token = await this.usersService.create(createUserDto);
+    return {
+      status: 4,
+      message: 'User created successfully',
+      data: {
+        token,
+      },
+    };
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    const data = await this.usersService.findAll();
+    return {
+      message: 'All user fetched',
+      data,
+    };
   }
 
   @Get(':id')
@@ -44,7 +55,13 @@ export class UsersController {
   }
   @Public()
   @Post('/sign-in')
-  signIn(@Body() body: SignInDTO) {
-    return this.usersService.signIn(body);
+  async signIn(@Body() body: SignInDTO) {
+    const token = await this.usersService.signIn(body);
+    return {
+      data: {
+        message: 'Sign in success',
+        data: { token },
+      },
+    };
   }
 }

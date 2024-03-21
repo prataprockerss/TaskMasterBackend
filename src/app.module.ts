@@ -7,6 +7,9 @@ import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { TodoModule } from './todo/todo.module';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { GlobalExceptionFilter } from './exception/global.exception';
+import { GlobalResponse } from './interceptors/response.interceptors';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,6 +24,16 @@ import { TodoModule } from './todo/todo.module';
     TodoModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: GlobalResponse
+    }
+  ],
 })
 export class AppModule {}

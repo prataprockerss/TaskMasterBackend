@@ -25,10 +25,6 @@ import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor
     }
   ],
   exports: [UsersService],
