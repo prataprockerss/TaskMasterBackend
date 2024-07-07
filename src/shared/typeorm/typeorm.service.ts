@@ -8,13 +8,13 @@ export class TypeOrmConfigService {
   private readonly config: ConfigService;
   public createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
-      type: 'postgres',
+      type: 'mysql',
       host: this.config.get('DB_HOST'),
       port: this.config.get('DB_PORT'),
       username: this.config.get('DB_USER'),
       password: this.config.get('DB_PASSWORD'),
       database: this.config.get('DB_NAME'),
-      schema: 'public',
+      synchronize: this.config.get('DB_SYNC'),
       logging: false,
       autoLoadEntities: true,
     };

@@ -1,39 +1,46 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { SignInDTO } from './dto/sign-in-dto';
+import {ApiTags} from '@nestjs/swagger'
 import { Public } from 'src/decorator/public.decorator';
+import { LoginUserDto } from './dto/login-user.dto';
+import { Roles } from 'src/decorator/role.decorator';
+import { Role } from 'src/enums/role.enum';
+
 @Controller('users')
+@ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Post('signup')
   @Public()
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    const token = await this.usersService.create(createUserDto);
+  async signup(@Body() body: CreateUserDto) {
+    const response = await this.usersService.signup(body);
     return {
-      status: 4,
+      status: 1,
       message: 'User created successfully',
-      data: {
-        token,
-      },
+      data: response,
+    };
+  }
+  @Post('login')
+  @Public()
+  async login(@Body() body: LoginUserDto) {
+    const response = await this.usersService.login(body);
+    return {
+      status: 1,
+      message: 'Login Successful ',
+      data: response,
     };
   }
 
   @Get()
+  @Roles(Role.Admin)
   async findAll() {
     const data = await this.usersService.findAll();
     return {
-      message: 'All user fetched',
+      status: 1,
+      message: 'User created successfully',
       data,
     };
   }
@@ -48,19 +55,8 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
-  @Public()
-  @Post('/sign-in')
-  async signIn(@Body() body: SignInDTO) {
-    const token = await this.usersService.signIn(body);
-    return {
-      data: {
-        message: 'Sign in success',
-        data: { token },
-      },
-    };
+  @Delete(':guid')
+  remove(@Param('guid') guid: string) {
+    return this.usersService.remove(guid);
   }
 }

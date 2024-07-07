@@ -15,6 +15,7 @@ export class GlobalResponse implements NestInterceptor {
           status: response.status,
           message: response.message,
           data: response.data,
+          error : null
         };
       }),
     );

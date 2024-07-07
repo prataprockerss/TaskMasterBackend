@@ -1,80 +1,125 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
-import { SignInDTO } from './dto/sign-in-dto';
+import { ROLE_ID } from './constants';
+import { UserRoles } from './entities/userRole.entity';
+import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private configService: ConfigService,
-    private jwtService: JwtService,
     @InjectRepository(User)
-    readonly userRepository: Repository<User>,
+    private userRepo: Repository<User>,
+    @InjectRepository(UserRoles)
+    private userRolesRepo: Repository<UserRoles>,
+    
+    private jwtService: JwtService,
+
+    private configService: ConfigService
   ) {}
+  async signup(properties: CreateUserDto) {
+    const hashPassword = await bcrypt.hash(properties.password, 10);
+    const userGuid = uuidv4();
 
-  async create(createUserDto: CreateUserDto) {
-    createUserDto.password = await this.convertHashPassword(
-      createUserDto.password,
+    const user = this.userRepo.create({
+      guid: userGuid,
+      email: properties.email,
+      mobile: properties.mobile,
+      password: hashPassword,
+      created_by: userGuid,
+      username: properties.username,
+    });
+
+    await this.userRepo.save(user);
+    
+
+    const userRoles = [];
+
+    userRoles.push(
+      this.userRolesRepo.create({
+        role_id: ROLE_ID.USER,
+        user_guid: user.guid,
+        created_by: user.guid,
+      }),
     );
-    createUserDto.guid = uuid();
-    const { email, guid } = await this.userRepository.save(createUserDto);
-    const token = this.signToken({
-      email: email,
-      userId: guid,
-    });
-    return token;
+
+    await this.userRolesRepo.save(userRoles);
+    
+    return {
+      success: 1,
+    };
   }
 
-  findAll() {
-    return this.userRepository.find({
-      select: ['firstName', 'lastName', 'guid', 'email', 'addedOn'],
-    });
+  async findAll() {
+    return await this.userRepo.createQueryBuilder('user')
+    .leftJoinAndSelect('user.roles', 'userRoles')
+    .leftJoinAndSelect('userRoles.role', 'role')
+    .select([
+      'user.guid',
+      'user.email',
+      'user.mobile',
+      'user.username',
+      'userRoles.id',  
+      'role.id',
+      'role.role',
+    ])
+    .getMany()
+
   }
 
-  findOne(Params) {
-    return this.userRepository.findOne({
-      where: Params,
-    });
+  async findOne(id: number) {
+    return await this.userRepo.createQueryBuilder('user')
+    .leftJoinAndSelect('user.roles', 'userRoles')
+    .leftJoinAndSelect('userRoles.role', 'role')
+    .select([
+      'user.guid',
+      'user.email',
+      'user.mobile',
+      'user.username',
+      'userRoles.id',  
+      'role.id',
+      'role.role',
+    ])
+    .where({
+      guid: id
+    })
+    .getOne()
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    updateUserDto.updatedOn = new Date().toISOString();
-    return this.userRepository.update(id, updateUserDto);
+    return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
-  async signIn({ email, password }: SignInDTO) {
-    const user = await this.findOne({ email });
-    if (!user) {
-      throw new UnauthorizedException();
+  async login(body:LoginUserDto) {
+    // find user 
+    const user = await this.userRepo.findOne({
+      where: {
+        email: body.email
+      }
+    })
+    // verify password
+    const isValidPassword = await bcrypt.compare(body.password,user.password)
+    if(!isValidPassword) {
+      throw new UnauthorizedException('Email or password is wrong')
     }
-
-    const matchPass = await bcrypt.compare(password, user.password);
-
-    if (!matchPass) {
-      throw new UnauthorizedException();
-    }
-
-    const token = this.signToken({ email: user.email, id: user.guid });
-
-    return token;
+    // return jwt token 
+    const token = await this.jwtService.sign({
+      id: user.guid,
+      roles: user.roles
+    },{secret: this.configService.get('SECRET_KEY')})
+    return {
+      token
+    };
   }
 
-  async convertHashPassword(plainPassword: string): Promise<string> {
-    return await bcrypt.hash(plainPassword, 10);
-  }
-
-  signToken(payload) {
-    return this.jwtService.sign(payload);
+  async remove(id: string) {
+    return await this.userRepo.delete({ guid: id });
   }
 }

@@ -3,29 +3,14 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from 'src/guards/auth.guards';
+import { UserRoles } from './entities/userRole.entity';
+import { Role } from './entities/role.entitiy';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    JwtModule.register({
-      global: true,
-      secret: 'TEST',
-      signOptions: {
-        expiresIn: '10m',
-      },
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([User, UserRoles,Role]),],
   controllers: [UsersController],
-  providers: [
-    UsersService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
-  exports: [UsersService],
+  providers: [UsersService,JwtService],
+  exports : [UsersService]
 })
 export class UsersModule {}
